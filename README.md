@@ -2,12 +2,31 @@
 
 API REST (FastAPI) que coloca em produção o projeto integrador **Otimização da Planta Química Nexus-Chem**:
 
-- **Random Forest**: prevê se uma leitura de sensores indica **falha de vazão** (`falha_vazao`) e devolve a probabilidade.
+- **Regressão Logística**: prevê se uma leitura de sensores indica **falha de vazão** (`falha_vazao`) e devolve a probabilidade. Ela foi escolhida contra o Random Forest do notebook em validação cruzada (veja "Resultados").
 - **K-Means**: identifica o **regime operacional** da leitura (Estável / Atenção / Alto risco), nomeado pela taxa de falha histórica de cada cluster.
 
 O pré-processamento do notebook (remoção de duplicatas, mediana e moda nos faltantes, capping por IQR, `razao_vazao`, `desvio_vazao_abs`, one-hot e StandardScaler) roda dentro de um `Pipeline` do scikit-learn. Assim a API recebe os dados **brutos**, do jeito que vêm da planta, e aplica exatamente as mesmas transformações do treino.
 
-> O modelo em `artifacts/` foi treinado com o arquivo `dataset_projeto_integrador_nexus_chem.csv` fornecido para este projeto: 638 linhas lidas, com 18 duplicatas removidas (620 registros no treino). O `GET /health` informa em `base_treino` qual arquivo originou o modelo carregado.
+O modelo em `artifacts/` já foi treinado com a base real (`dataset_projeto_integrador_nexus_chem.csv`, 620 linhas sem duplicatas).
+
+## Resultados
+
+Mesmo conjunto de teste do notebook: 124 leituras, das quais 22 são falhas reais.
+
+| | Notebook (Random Forest) | API (Regressão Logística) |
+|---|---|---|
+| Falhas detectadas (recall) | 12 de 22 (55%) | **19 de 22 (86%)** |
+| Falhas que passaram despercebidas | 10 | **3** |
+| Alarmes falsos | 14 | 24 |
+| F1 treino → teste | 0,92 → 0,50 | 0,77 → 0,58 |
+| Usa `regime_operacional_referencia` | sim | não |
+
+O que mudou:
+- **Modelo:** o treino compara Regressão Logística e Random Forest em validação cruzada, e vence o de maior precisão média. Com 620 linhas, o modelo mais simples generaliza melhor, e o overfitting caiu de 0,42 para 0,18 de diferença no F1.
+- **Limiar:** passou de 0,5 para 0,45, escolhido pelo F2, que dá peso dobrado ao recall. A troca é de 10 alarmes falsos a mais por 7 falhas reais a menos passando sem aviso.
+- **Coluna removida:** `regime_operacional_referencia` saiu das entradas por risco de vazamento. Nos testes, tirá-la não piorou o modelo.
+
+As variáveis que mais pesam são `leituras_invalidas`, `vibracao_bomba_mm_s`, `tempo_resposta_s`, `indice_estabilidade` e `status_sensor = Descalibrado`.
 
 ## Estrutura
 
@@ -46,9 +65,9 @@ Depois abra http://localhost:8000/docs, que tem a documentação interativa com 
 
 **Render** (mais simples)
 1. Suba o projeto para o GitHub, já com o modelo treinado em `artifacts/`.
-2. No Render, escolha *New → Blueprint* e selecione o repositório. O `render.yaml` configura o serviço Docker, o plano Free e a rota de health check.
+2. No Render: *New → Web Service* → escolha o repositório → Runtime **Docker** → plano Free.
 3. (Opcional) Em *Environment*, crie a variável `API_KEY` para exigir senha.
-4. A URL sai no formato `https://nexus-chem-api.onrender.com/docs`. No plano free, o serviço pode dormir após inatividade; a primeira chamada pode demorar enquanto ele inicia.
+4. A URL sai no formato `https://nexus-chem-api.onrender.com/docs`. No plano free, o serviço "dorme" depois de 15 min sem uso, então a primeira chamada depois disso demora uns 30 s.
 
 **Hugging Face Spaces**
 1. *New Space* → SDK **Docker** → *Blank*.
@@ -75,7 +94,7 @@ curl -X POST https://SUA-URL/predict \
   -d '{
     "linha_producao": "Linha_B", "turno": "Tarde", "produto": "Polimero_C",
     "reagente_principal": "R3", "tipo_valvula": "Globo", "status_sensor": "Descalibrado",
-    "modo_operacao": "Contínuo", "regime_operacional_referencia": "Crítico",
+    "modo_operacao": "Contínuo",
     "vazao_setpoint_l_min": 108.36, "vazao_real_l_min": 60.82, "pressao_bar": 3.1,
     "temperatura_c": 54.2, "abertura_valvula_pct": 66.0, "vibracao_bomba_mm_s": 2.6,
     "consumo_energia_kwh": 42.5, "tempo_resposta_s": 5.8, "ph_produto": 6.05,
@@ -103,6 +122,6 @@ Os campos `produto`, `status_sensor`, `pressao_bar`, `temperatura_c`, `tempo_res
 
 ## Pontos de atenção
 
-- **`regime_operacional_referencia` como entrada:** o notebook usa essa coluna como preditora, e a API mantém isso. Se em operação real ela só for conhecida *depois* do evento, é vazamento de dados. Vale retreinar sem ela (basta tirá-la de `CATEGORICAS` em `app/features.py`).
-- **Overfitting:** no notebook, o F1 de treino foi 0,92 contra 0,50 no teste. O `GET /modelo` mostra as métricas de treino e de teste lado a lado, para acompanhar isso a cada novo treino.
+- **Base pequena:** com só 22 falhas no teste, cada acerto ou erro mexe vários pontos nas métricas. Com mais dados históricos, vale retreinar.
+- **Alarmes falsos:** com o limiar de 0,45, cerca de metade dos alertas é falso. Se a operação achar que isso é demais, suba o limiar na chamada (`?limiar=0.6`). O `GET /modelo` mostra as métricas de treino e de teste lado a lado.
 - **Versões:** o modelo `.joblib` só carrega com a mesma versão do scikit-learn usada no treino (fixada no `requirements.txt` e no notebook do Colab).

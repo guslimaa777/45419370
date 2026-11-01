@@ -36,7 +36,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Nexus-Chem — API de Falha de Vazão",
     description=(
-        "Prevê falhas de vazão (Random Forest) e identifica o regime operacional "
+        "Prevê falhas de vazão (Regressão Logística, escolhida contra Random Forest) e identifica o regime operacional "
         "(K-Means) a partir das leituras de sensores da planta química Nexus-Chem."
     ),
     version="1.0.0",

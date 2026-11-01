@@ -26,7 +26,10 @@ def test_health(client):
 def test_modelo(client):
     r = client.get("/modelo")
     assert r.status_code == 200
-    assert "metricas_teste" in r.json()
+    metadata = r.json()
+    assert "metricas_teste" in metadata
+    assert metadata["modelo"] == "LogisticRegression"
+    assert metadata["limiar_padrao"] == 0.45
 
 
 def test_predict(client):
@@ -36,6 +39,11 @@ def test_predict(client):
     assert 0 <= corpo["probabilidade_falha"] <= 1
     assert corpo["nivel_risco"] in {"baixo", "medio", "alto"}
     assert corpo["id_registro"] == "NEX_00001"
+
+
+def test_predict_sem_regime_operacional_referencia(client):
+    assert "regime_operacional_referencia" not in EXEMPLO
+    assert client.post("/predict", json=EXEMPLO).status_code == 200
 
 
 def test_predict_com_faltantes(client):

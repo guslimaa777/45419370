@@ -7,9 +7,11 @@ import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
+# `regime_operacional_referencia` ficou de fora: pode ser conhecida só depois do evento
+# (vazamento) e, nos testes, tirá-la não piorou o modelo.
 CATEGORICAS = [
     "linha_producao", "turno", "produto", "reagente_principal",
-    "tipo_valvula", "status_sensor", "modo_operacao", "regime_operacional_referencia",
+    "tipo_valvula", "status_sensor", "modo_operacao",
 ]
 
 NUMERICAS_BRUTAS = [

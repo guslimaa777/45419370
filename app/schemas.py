@@ -9,7 +9,6 @@ Reagente = Literal["R1", "R2", "R3", "R4"]
 TipoValvula = Literal["Globo", "Esfera", "Borboleta"]
 StatusSensor = Literal["Normal", "Suspeito", "Descalibrado"]
 ModoOperacao = Literal["Contínuo", "Lote"]
-Regime = Literal["Estável", "Atenção", "Crítico"]
 
 EXEMPLO = {
     "id_registro": "NEX_00001",
@@ -36,7 +35,6 @@ EXEMPLO = {
     "umidade_ambiente_pct": 45.3,
     "erro_vazao_pct": 43.9,
     "indice_estabilidade": 41.0,
-    "regime_operacional_referencia": "Crítico",
 }
 
 
@@ -53,7 +51,6 @@ class Leitura(BaseModel):
     tipo_valvula: TipoValvula
     status_sensor: Optional[StatusSensor] = None
     modo_operacao: ModoOperacao
-    regime_operacional_referencia: Regime
 
     vazao_setpoint_l_min: float = Field(..., gt=0)
     vazao_real_l_min: float = Field(..., ge=0)

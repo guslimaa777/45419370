@@ -1,92 +1,122 @@
 {
   "projeto": "Nexus-Chem — previsão de falha de vazão",
-  "treinado_em": "2026-11-01T21:43:48+00:00",
+  "treinado_em": "2026-11-01T22:10:56+00:00",
   "versao_sklearn": "1.9.1",
   "base_treino": "dataset_projeto_integrador_nexus_chem.csv",
   "linhas_treino": 620,
   "taxa_falha_base": 0.1806,
-  "limiar_padrao": 0.5,
-  "melhores_hiperparametros": {
-    "class_weight": "balanced",
-    "max_depth": 8,
-    "min_samples_split": 10,
-    "n_estimators": 50
+  "modelo": "LogisticRegression",
+  "hiperparametros": {
+    "C": 0.1
   },
-  "f1_validacao_cruzada": 0.6504,
+  "limiar_padrao": 0.45,
+  "criterio_limiar": "máximo F2 (recall vale 2x a precisão) em validação cruzada no treino",
+  "precisao_media_validacao_cruzada": 0.8319,
   "metricas_teste": {
-    "acuracia": 0.7984,
-    "precisao_falha": 0.4516,
-    "recall_falha": 0.6364,
-    "f1_falha": 0.5283,
-    "roc_auc": 0.8471,
+    "limiar": 0.45,
+    "acuracia": 0.7823,
+    "precisao_falha": 0.4419,
+    "recall_falha": 0.8636,
+    "f1_falha": 0.5846,
+    "f2_falha": 0.7252,
+    "roc_auc": 0.877,
+    "precisao_media": 0.6102,
     "matriz_confusao": [
       [
-        85,
-        17
+        78,
+        24
       ],
       [
-        8,
-        14
+        3,
+        19
       ]
     ]
   },
   "metricas_treino": {
-    "acuracia": 0.9718,
-    "precisao_falha": 0.8654,
-    "recall_falha": 1.0,
-    "f1_falha": 0.9278,
-    "roc_auc": 1.0,
+    "limiar": 0.45,
+    "acuracia": 0.8952,
+    "precisao_falha": 0.6439,
+    "recall_falha": 0.9444,
+    "f1_falha": 0.7658,
+    "f2_falha": 0.8638,
+    "roc_auc": 0.9707,
+    "precisao_media": 0.889,
     "matriz_confusao": [
       [
-        392,
-        14
+        359,
+        47
       ],
       [
-        0,
-        90
+        5,
+        85
       ]
     ]
   },
+  "variaveis_entrada": [
+    "vazao_setpoint_l_min",
+    "vazao_real_l_min",
+    "pressao_bar",
+    "temperatura_c",
+    "abertura_valvula_pct",
+    "vibracao_bomba_mm_s",
+    "consumo_energia_kwh",
+    "tempo_resposta_s",
+    "ph_produto",
+    "viscosidade_cp",
+    "densidade_g_cm3",
+    "horas_operacao_bomba",
+    "leituras_invalidas",
+    "umidade_ambiente_pct",
+    "erro_vazao_pct",
+    "indice_estabilidade",
+    "linha_producao",
+    "turno",
+    "produto",
+    "reagente_principal",
+    "tipo_valvula",
+    "status_sensor",
+    "modo_operacao"
+  ],
   "top_variaveis": [
     {
-      "variavel": "num__indice_estabilidade",
-      "importancia": 0.171
+      "variavel": "num__leituras_invalidas",
+      "peso": 1.2339
     },
     {
       "variavel": "num__vibracao_bomba_mm_s",
-      "importancia": 0.1362
-    },
-    {
-      "variavel": "num__leituras_invalidas",
-      "importancia": 0.1125
-    },
-    {
-      "variavel": "num__erro_vazao_pct",
-      "importancia": 0.0924
-    },
-    {
-      "variavel": "num__razao_vazao",
-      "importancia": 0.0583
+      "peso": 1.0621
     },
     {
       "variavel": "num__tempo_resposta_s",
-      "importancia": 0.0571
+      "peso": 0.7948
+    },
+    {
+      "variavel": "num__indice_estabilidade",
+      "peso": 0.6953
+    },
+    {
+      "variavel": "cat__status_sensor_Descalibrado",
+      "peso": 0.5347
+    },
+    {
+      "variavel": "num__erro_vazao_pct",
+      "peso": 0.4361
+    },
+    {
+      "variavel": "cat__status_sensor_Normal",
+      "peso": 0.4008
+    },
+    {
+      "variavel": "cat__linha_producao_Linha_D",
+      "peso": 0.3647
     },
     {
       "variavel": "num__desvio_vazao_abs",
-      "importancia": 0.0518
+      "peso": 0.3556
     },
     {
-      "variavel": "num__abertura_valvula_pct",
-      "importancia": 0.0284
-    },
-    {
-      "variavel": "num__temperatura_c",
-      "importancia": 0.0257
-    },
-    {
-      "variavel": "num__umidade_ambiente_pct",
-      "importancia": 0.0248
+      "variavel": "cat__turno_Noite",
+      "peso": 0.2372
     }
   ],
   "kmeans": {
