@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: nexus-chem-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

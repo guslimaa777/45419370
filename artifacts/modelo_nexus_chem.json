@@ -1,0 +1,110 @@
+{
+  "projeto": "Nexus-Chem — previsão de falha de vazão",
+  "treinado_em": "2026-11-01T21:43:48+00:00",
+  "versao_sklearn": "1.9.1",
+  "base_treino": "dataset_projeto_integrador_nexus_chem.csv",
+  "linhas_treino": 620,
+  "taxa_falha_base": 0.1806,
+  "limiar_padrao": 0.5,
+  "melhores_hiperparametros": {
+    "class_weight": "balanced",
+    "max_depth": 8,
+    "min_samples_split": 10,
+    "n_estimators": 50
+  },
+  "f1_validacao_cruzada": 0.6504,
+  "metricas_teste": {
+    "acuracia": 0.7984,
+    "precisao_falha": 0.4516,
+    "recall_falha": 0.6364,
+    "f1_falha": 0.5283,
+    "roc_auc": 0.8471,
+    "matriz_confusao": [
+      [
+        85,
+        17
+      ],
+      [
+        8,
+        14
+      ]
+    ]
+  },
+  "metricas_treino": {
+    "acuracia": 0.9718,
+    "precisao_falha": 0.8654,
+    "recall_falha": 1.0,
+    "f1_falha": 0.9278,
+    "roc_auc": 1.0,
+    "matriz_confusao": [
+      [
+        392,
+        14
+      ],
+      [
+        0,
+        90
+      ]
+    ]
+  },
+  "top_variaveis": [
+    {
+      "variavel": "num__indice_estabilidade",
+      "importancia": 0.171
+    },
+    {
+      "variavel": "num__vibracao_bomba_mm_s",
+      "importancia": 0.1362
+    },
+    {
+      "variavel": "num__leituras_invalidas",
+      "importancia": 0.1125
+    },
+    {
+      "variavel": "num__erro_vazao_pct",
+      "importancia": 0.0924
+    },
+    {
+      "variavel": "num__razao_vazao",
+      "importancia": 0.0583
+    },
+    {
+      "variavel": "num__tempo_resposta_s",
+      "importancia": 0.0571
+    },
+    {
+      "variavel": "num__desvio_vazao_abs",
+      "importancia": 0.0518
+    },
+    {
+      "variavel": "num__abertura_valvula_pct",
+      "importancia": 0.0284
+    },
+    {
+      "variavel": "num__temperatura_c",
+      "importancia": 0.0257
+    },
+    {
+      "variavel": "num__umidade_ambiente_pct",
+      "importancia": 0.0248
+    }
+  ],
+  "kmeans": {
+    "k": 3,
+    "silhueta": 0.1452,
+    "clusters": {
+      "1": {
+        "regime": "Estável",
+        "taxa_falha_historica": 0.0373
+      },
+      "0": {
+        "regime": "Atenção",
+        "taxa_falha_historica": 0.1392
+      },
+      "2": {
+        "regime": "Alto risco",
+        "taxa_falha_historica": 0.4108
+      }
+    }
+  }
+}
